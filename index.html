@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K-pop Photo Booth</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Poppins:wght@800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="assets/camera.svg">
+</head>
+<body>
+  <div class="main-content">
+    <h1 class="site-title">📸 K-pop Photo Booth</h1>
+    
+    <div class="controls">
+      <select id="memberSelect">
+        <option value="">-- Select an Idol --</option>
+        <option value="yeji">Yeji</option>
+        <option value="lia">Lia</option>
+        <option value="ryujin">Ryujin</option>
+        <option value="chaeryeong">Chaeryeong</option>
+        <option value="yuna">Yuna</option>
+        <option value="gowon">Gowon</option>
+        <option value="dahyun">Dahyun</option>
+      </select>
+      <button id="captureBtn">Take Photo</button>
+    </div>
+
+    <div class="preview">
+      <video id="webcam" autoplay playsinline></video>
+      <img id="overlayImage" class="overlay" />
+      <div id="countdown" class="countdown"></div>
+      <button id="flashBtn" title="Toggle Flash (default: off)" class="flash-btn" type="button">
+        <!-- Flash Off SVG (default) -->
+        <svg id="flashOffIcon" width="28" height="28" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 2v11h3v9l7-12h-4l4-8z" opacity="0.3"/>
+          <line x1="3" y1="3" x2="21" y2="21" stroke="#ffb300" stroke-width="2"/>
+        </svg>
+        <!-- Flash On SVG (hidden by default) -->
+        <svg id="flashOnIcon" width="28" height="28" viewBox="0 0 24 24" fill="#ffb300" style="display:none;" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+        </svg>
+        <span class="tooltip">Toggle Flash</span>
+      </button>
+      <button id="flipBtn" title="Flip Camera (mirror selfie)" class="flip-btn" type="button">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.65 6.35A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.76-4.24l-2.79 2.79H22V2l-4.35 4.35z"/>
+        </svg>
+        <span class="tooltip">Flip Camera</span>
+      </button>
+      <button id="upscaleBtn" title="Swap to Upscaled Overlay" class="upscale-btn" type="button">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 19V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <path d="M6 11L12 5L18 11" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="tooltip">Swap to Upscaled Overlay</span>
+      </button>
+    </div>
+
+    <div id="photosContainer" class="photos-container"></div>
+
+    <a id="downloadStripBtn" style="display: none;" class="download-link">Download Photo Strip</a>
+  </div>
+  <footer class="site-footer">
+    <span>Angel Gomez-Hummel - 2025</span><br>
+    <span>Built using HTML, CSS, and JavaScript. Look at some of my other projects on 
+      <a href="https://github.com/GomezHummel?tab=repositories" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </span>
+    <br>
+    <small class="disclaimer">
+      All images belong to their respective owners. This site is a fan-made, non-commercial project for educational and personal use only.
+    </small>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
