@@ -56,10 +56,10 @@ document.querySelector('.controls').appendChild(overlaySelect);
 
 const overlays = {
   lia: [
-    { file: 'Lia1.png', label: 'Lia Pose 1' },
-    { file: 'Lia2.png', label: 'Lia Pose 2' },
-    { file: 'Lia3.png', label: 'Lia Pose 3' },
-    { file: 'Lia4.png', label: 'Lia Pose 4' }
+    { file: 'lia1.png', label: 'Lia Pose 1' },
+    { file: 'lia2.png', label: 'Lia Pose 2' },
+    { file: 'lia3.png', label: 'Lia Pose 3' },
+    { file: 'lia4.png', label: 'Lia Pose 4' }
   ],
   yeji: [
     { file: 'yeji1.png', label: 'Yeji Pose 1' },
@@ -74,10 +74,10 @@ const overlays = {
     { file: 'ryujin4.png', label: 'Ryujin Pose 4' }
   ],
   chaeryeong: [
-    { file: 'Chaeryeong1.png', label: 'Chaeryeong Pose 1' },
-    { file: 'Chaeryeong2.png', label: 'Chaeryeong Pose 2' },
-    { file: 'Chaeryeong3.png', label: 'Chaeryeong Pose 3' },
-    { file: 'Chaeryeong4.png', label: 'Chaeryeong Pose 4' }
+    { file: 'chaeryeong1.png', label: 'Chaeryeong Pose 1' },
+    { file: 'chaeryeong2.png', label: 'Chaeryeong Pose 2' },
+    { file: 'chaeryeong3.png', label: 'Chaeryeong Pose 3' },
+    { file: 'chaeryeong4.png', label: 'Chaeryeong Pose 4' }
   ],
   yuna: [
     { file: 'yuna1.png', label: 'Yuna Pose 1' },
