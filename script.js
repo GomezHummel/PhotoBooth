@@ -31,28 +31,9 @@ document.getElementById('memberSelect').onchange = function() {
     return;
   }
 
-  // Update overlay options
-  const overlaySelect = document.getElementById('overlaySelect');
-  overlaySelect.innerHTML = '<option value="">-- Select Overlay --</option>';
-  if (overlays[member]) {
-    overlays[member].forEach((img, idx) => {
-      const opt = document.createElement('option');
-      opt.value = img;
-      opt.textContent = img.replace('.png', '');
-      overlaySelect.appendChild(opt);
-    });
-  }
-
   // Load first overlay by default
   overlayImage.src = `overlays/${member}/${capitalize(member)}1.png`;
 };
-
-const overlaySelect = document.createElement('select');
-overlaySelect.id = 'overlaySelect';
-overlaySelect.style.marginLeft = '10px';
-overlaySelect.style.display = 'none'; // Hide by default
-
-document.querySelector('.controls').appendChild(overlaySelect);
 
 const overlays = {
   lia: [
@@ -99,52 +80,151 @@ const overlays = {
   ]
 };
 
+// Idol group mapping for filtering
+const idolGroups = {
+  itzy: ['yeji', 'lia', 'ryujin', 'chaeryeong', 'yuna'],
+  loona: ['gowon'],
+  twice: ['dahyun']
+};
+
+const groupSelect = document.getElementById('groupSelect');
+const memberSelect = document.getElementById('memberSelect');
+const poseGrid = document.getElementById('poseGrid');
+
+function getMemberOverlays(member) {
+  return overlays[member] || [];
+}
+
+let posePage = 0;
+const POSES_PER_PAGE = 9;
+
+function renderPoseGrid(members, page = 0) {
+  poseGrid.innerHTML = '';
+  if (!members || members.length === 0) return;
+  // Gather all overlays for the current filter
+  let allOverlays = [];
+  members.forEach(member => {
+    const memberOverlays = getMemberOverlays(member).filter(obj => !/Up\d+\.png$/i.test(obj.file));
+    memberOverlays.forEach((obj, idx) => {
+      allOverlays.push({ member, obj });
+    });
+  });
+  // Pagination
+  const totalPages = Math.ceil(allOverlays.length / POSES_PER_PAGE);
+  const start = page * POSES_PER_PAGE;
+  const end = start + POSES_PER_PAGE;
+  const overlaysToShow = allOverlays.slice(start, end);
+  overlaysToShow.forEach(({ member, obj }) => {
+    const poseDiv = document.createElement('div');
+    poseDiv.className = 'pose-thumb';
+    const img = document.createElement('img');
+    img.src = `overlays/${member}/${obj.file}`;
+    img.alt = obj.label;
+    img.title = obj.label;
+    poseDiv.appendChild(img);
+    const label = document.createElement('div');
+    label.className = 'pose-label';
+    label.textContent = obj.label;
+    poseDiv.appendChild(label);
+    poseDiv.addEventListener('click', () => {
+      memberSelect.value = member;
+      overlayImage.src = `overlays/${member}/${obj.file}`;
+      currentOverlayFile = obj.file;
+      isUpscaled = false;
+      upscaleBtn.title = 'Swap to Upscaled Overlay';
+      upscaleBtn.querySelector('.tooltip').textContent = 'Swap to Upscaled Overlay';
+    });
+    poseGrid.appendChild(poseDiv);
+  });
+  // Pagination controls
+  if (totalPages > 1) {
+    const paginationDiv = document.createElement('div');
+    paginationDiv.className = 'pose-pagination';
+    // Add a spacer div if overlaysToShow.length % 3 !== 0 to push pagination to new line
+    if (overlaysToShow.length % 3 !== 0) {
+      const spacer = document.createElement('div');
+      spacer.style.flexBasis = '100%';
+      spacer.style.height = '0';
+      poseGrid.appendChild(spacer);
+    }
+    if (page > 0) {
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'pose-page-btn arrow-btn';
+      prevBtn.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      prevBtn.onclick = () => {
+        posePage--;
+        renderPoseGrid(members, posePage);
+      };
+      paginationDiv.appendChild(prevBtn);
+    }
+    const pageIndicator = document.createElement('span');
+    pageIndicator.className = 'pose-page-indicator';
+    pageIndicator.textContent = `Page ${page + 1} of ${totalPages}`;
+    paginationDiv.appendChild(pageIndicator);
+    if (page < totalPages - 1) {
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'pose-page-btn arrow-btn';
+      nextBtn.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      nextBtn.onclick = () => {
+        posePage++;
+        renderPoseGrid(members, posePage);
+      };
+      paginationDiv.appendChild(nextBtn);
+    }
+    poseGrid.appendChild(paginationDiv);
+  }
+}
+
+function filterMembersByGroup(group) {
+  for (const option of memberSelect.options) {
+    if (!option.value || option.value === 'all') continue;
+    const idol = option.value;
+    const idolGroup = Object.keys(idolGroups).find(g => idolGroups[g].includes(idol));
+    option.style.display = (group === 'all' || idolGroup === group) ? '' : 'none';
+  }
+  // If current selection is not in group, reset to all
+  if (memberSelect.value !== 'all' && memberSelect.options[memberSelect.selectedIndex].style.display === 'none') {
+    memberSelect.value = 'all';
+  }
+}
+
+groupSelect.addEventListener('change', function() {
+  filterMembersByGroup(this.value);
+  // Show all members of group in grid
+  let members = [];
+  if (this.value === 'all') {
+    members = Object.values(idolGroups).flat();
+  } else {
+    members = idolGroups[this.value] || [];
+  }
+  memberSelect.value = 'all';
+  posePage = 0;
+  renderPoseGrid(members, posePage);
+});
+
+memberSelect.addEventListener('change', function() {
+  if (this.value === 'all') {
+    let group = groupSelect.value;
+    let members = group === 'all' ? Object.values(idolGroups).flat() : idolGroups[group] || [];
+    posePage = 0;
+    renderPoseGrid(members, posePage);
+  } else {
+    posePage = 0;
+    renderPoseGrid([this.value], posePage);
+  }
+});
+
 // Helper to capitalize first letter
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Helper to update overlay select options and image
-function updateOverlayOptions(member) {
-  overlaySelect.innerHTML = '';
-  overlayImage.src = '';
-  if (overlays[member] && overlays[member].length > 0) {
-    overlays[member].forEach((obj, idx) => {
-      const opt = document.createElement('option');
-      opt.value = obj.file;
-      opt.textContent = obj.label;
-      overlaySelect.appendChild(opt);
-    });
-    overlaySelect.style.display = '';
-    overlaySelect.selectedIndex = 0;
-    overlayImage.src = `overlays/${member}/${overlays[member][0].file}`;
-  } else if (member) {
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = 'No overlay';
-    overlaySelect.appendChild(opt);
-    overlaySelect.style.display = '';
-    overlayImage.src = '';
-  } else {
-    overlaySelect.style.display = 'none';
-    overlayImage.src = '';
-  }
-}
-
 // Unified member select handler
-const memberSelect = document.getElementById('memberSelect');
 memberSelect.onchange = function() {
   overlayIndex = 1;
   snapshots = [];
   // Only clear overlays and overlay image, not photos
   updateOverlayOptions(this.value);
-};
-
-// Overlay select handler
-overlaySelect.onchange = function() {
-  const member = memberSelect.value;
-  const overlay = overlaySelect.value;
-  overlayImage.src = (member && overlay) ? `overlays/${member}/${overlay}` : '';
 };
 
 // Show capture button by default
@@ -198,7 +278,8 @@ function takePhotoWithOverlay() {
     ctx.drawImage(overlayImage, 0, 0, canvas.width, canvas.height);
   }
   const dataUrl = canvas.toDataURL('image/png');
-  const overlayLabel = overlaySelect.options[overlaySelect.selectedIndex]?.textContent || 'Photo';
+  // Use currentOverlayFile or fallback to 'Photo'
+  const overlayLabel = currentOverlayFile || 'Photo';
   if (photosContainer) {
     const item = document.createElement('div');
     item.className = 'photo-item';
@@ -206,14 +287,12 @@ function takePhotoWithOverlay() {
     img.src = dataUrl;
     img.alt = overlayLabel;
     img.style.opacity = '0';
-    setTimeout(() => { img.style.opacity = '1'; }, 10); // fade-in fallback
+    setTimeout(() => { img.style.opacity = '1'; }, 10);
     const link = document.createElement('a');
     link.href = dataUrl;
     link.download = overlayLabel.replace(/\s+/g, '_') + '.png';
     link.className = 'photo-download';
     link.textContent = 'Download PNG';
-    
-    // Add delete button
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Delete';
     delBtn.className = 'photo-delete';
@@ -316,6 +395,11 @@ flipBtn.addEventListener('click', () => {
 
 // Set initial flip state
 window.addEventListener('DOMContentLoaded', () => {
+  groupSelect.value = 'all';
+  memberSelect.value = 'all';
+  filterMembersByGroup('all');
+  posePage = 0;
+  renderPoseGrid(Object.values(idolGroups).flat(), posePage);
   document.getElementById('webcam').style.transform = 'scaleX(-1)';
 });
 
@@ -340,6 +424,9 @@ function positionTooltip(btn) {
 const upscaleBtn = document.getElementById('upscaleBtn');
 let isUpscaled = false;
 
+// Track the current overlay file for upscaling
+let currentOverlayFile = null;
+
 function getUpscaledOverlayFile(file) {
   // e.g. yeji1.png -> yejiUp1.png, Lia1.png -> LiaUp1.png
   if (!file) return '';
@@ -357,21 +444,21 @@ function getNormalOverlayFile(file) {
 
 upscaleBtn.addEventListener('click', () => {
   const member = memberSelect.value;
-  const overlay = overlaySelect.value;
-  if (!overlay) return;
+  if (!currentOverlayFile) return;
   let newFile;
   if (!isUpscaled) {
-    newFile = getUpscaledOverlayFile(overlay);
+    newFile = getUpscaledOverlayFile(currentOverlayFile);
     isUpscaled = true;
     upscaleBtn.title = 'Swap to Normal Overlay';
     upscaleBtn.querySelector('.tooltip').textContent = 'Swap to Normal Overlay';
   } else {
-    newFile = getNormalOverlayFile(overlay);
+    newFile = getNormalOverlayFile(currentOverlayFile);
     isUpscaled = false;
     upscaleBtn.title = 'Swap to Upscaled Overlay';
     upscaleBtn.querySelector('.tooltip').textContent = 'Swap to Upscaled Overlay';
   }
   overlayImage.src = `overlays/${member}/${newFile}`;
+  currentOverlayFile = newFile;
 });
 
 // When overlay changes, reset upscale state
@@ -387,3 +474,7 @@ memberSelect.addEventListener('change', () => {
   upscaleBtn.title = 'Swap to Upscaled Overlay';
   upscaleBtn.querySelector('.tooltip').textContent = 'Swap to Upscaled Overlay';
 });
+
+// Initial render
+filterMembersByGroup('all');
+renderPoseGrid(Object.values(idolGroups).flat());

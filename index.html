@@ -12,20 +12,6 @@
   <div class="main-content">
     <h1 class="site-title">📸 K-pop Photo Booth</h1>
     
-    <div class="controls">
-      <select id="memberSelect">
-        <option value="">-- Select an Idol --</option>
-        <option value="yeji">Yeji</option>
-        <option value="lia">Lia</option>
-        <option value="ryujin">Ryujin</option>
-        <option value="chaeryeong">Chaeryeong</option>
-        <option value="yuna">Yuna</option>
-        <option value="gowon">Gowon</option>
-        <option value="dahyun">Dahyun</option>
-      </select>
-      <button id="captureBtn">Take Photo</button>
-    </div>
-
     <div class="preview">
       <video id="webcam" autoplay playsinline></video>
       <img id="overlayImage" class="overlay" />
@@ -56,6 +42,27 @@
         <span class="tooltip">Swap to Upscaled Overlay</span>
       </button>
     </div>
+
+    <div class="controls controls-below">
+      <select id="groupSelect">
+        <option value="all">All Groups</option>
+        <option value="itzy">ITZY</option>
+        <option value="loona">LOONA</option>
+        <option value="twice">TWICE</option>
+      </select>
+      <select id="memberSelect">
+        <option value="all">All Members</option>
+        <option value="yeji" data-group="itzy">Yeji</option>
+        <option value="lia" data-group="itzy">Lia</option>
+        <option value="ryujin" data-group="itzy">Ryujin</option>
+        <option value="chaeryeong" data-group="itzy">Chaeryeong</option>
+        <option value="yuna" data-group="itzy">Yuna</option>
+        <option value="gowon" data-group="loona">Gowon</option>
+        <option value="dahyun" data-group="twice">Dahyun</option>
+      </select>
+      <button id="captureBtn">Take Photo</button>
+    </div>
+    <div id="poseGrid" class="pose-grid"></div>
 
     <div id="photosContainer" class="photos-container"></div>
 
