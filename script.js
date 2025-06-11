@@ -176,15 +176,30 @@ function renderPoseGrid(members, page = 0) {
 }
 
 function filterMembersByGroup(group) {
-  for (const option of memberSelect.options) {
-    if (!option.value || option.value === 'all') continue;
-    const idol = option.value;
-    const idolGroup = Object.keys(idolGroups).find(g => idolGroups[g].includes(idol));
-    option.style.display = (group === 'all' || idolGroup === group) ? '' : 'none';
+  // Save current value
+  const prevValue = memberSelect.value;
+  // Remove all except 'all'
+  while (memberSelect.options.length > 1) {
+    memberSelect.remove(1);
   }
-  // If current selection is not in group, reset to all
-  if (memberSelect.value !== 'all' && memberSelect.options[memberSelect.selectedIndex].style.display === 'none') {
+  let members = [];
+  if (group === 'all') {
+    members = Object.values(idolGroups).flat();
+  } else {
+    members = idolGroups[group] || [];
+  }
+  // Add options for filtered members
+  members.forEach(member => {
+    const option = document.createElement('option');
+    option.value = member;
+    option.textContent = member.charAt(0).toUpperCase() + member.slice(1);
+    memberSelect.appendChild(option);
+  });
+  // Reset to 'all' if previous value is not present
+  if (!Array.from(memberSelect.options).some(opt => opt.value === prevValue)) {
     memberSelect.value = 'all';
+  } else {
+    memberSelect.value = prevValue;
   }
 }
 
