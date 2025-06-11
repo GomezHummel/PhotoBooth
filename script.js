@@ -72,6 +72,12 @@ const overlays = {
     { file: 'gowon3.png', label: 'Gowon Pose 3' },
     { file: 'gowon4.png', label: 'Gowon Pose 4' }
   ],
+  nayeon: [
+    { file: 'nayeon1.png', label: 'Nayeon Pose 1'},
+    { file: 'nayeon2.png', label: 'Nayeon Pose 2'},
+    { file: 'nayeon3.png', label: 'Nayeon Pose 3'},
+    { file: 'nayeon4.png', label: 'Nayeon Pose 4'}
+  ],
   dahyun: [
     { file: 'dahyun1.png', label: 'Dahyun Pose 1'},
     { file: 'dahyun2.png', label: 'Dahyun Pose 2'},
@@ -84,7 +90,7 @@ const overlays = {
 const idolGroups = {
   itzy: ['yeji', 'lia', 'ryujin', 'chaeryeong', 'yuna'],
   loona: ['gowon'],
-  twice: ['dahyun']
+  twice: ['nayeon', 'dahyun']
 };
 
 const groupSelect = document.getElementById('groupSelect');
